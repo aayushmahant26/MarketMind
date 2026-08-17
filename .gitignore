@@ -1,0 +1,77 @@
+# Root .gitignore for Market Experiment
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+**/venv/
+**/env/
+
+# Python cache / compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+**/__pycache__/
+**/*.py[cod]
+**/*.pyc
+
+# Django specific files
+local_settings.py
+**/local_settings.py
+db.sqlite3
+db.sqlite3-journal
+**/db.sqlite3
+**/db.sqlite3-journal
+
+# Node.js / React build and dependencies
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+dist-ssr/
+**/dist-ssr/
+*.local
+
+# Environment variables & secrets (CRITICAL!)
+.env
+.env.local
+.env.*.local
+*.env
+**/.env
+**/.env.local
+**/.env.*.local
+**/*.env
+secrets.json
+**/secrets.json
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+**/.vscode/
+**/.idea/
+**/*.suo
+**/*.ntvs*
+**/*.njsproj
+**/*.sln
+**/*.sw?
+**/.DS_Store
+**/Thumbs.db
+
+# Python tooling
+.pytest_cache/
+.mypy_cache/
+
+# Logs
+*.log
+
+# Generated AI/ML files
+faiss_indexes/

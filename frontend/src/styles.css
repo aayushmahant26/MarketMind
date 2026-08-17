@@ -1,0 +1,431 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+
+:root {
+  /* Slate/Navy Professional Finance Theme */
+  --bg-dark: #090d16;                  /* Deep charcoal navy background */
+  --bg-plum: #111827;                  /* Slate-900 / Dark Gray for cards and sidebars */
+  --bg-wine: #1f2937;                  /* Slate-800 for buttons/accent areas */
+  
+  --color-lavender: #94a3b8;            /* Slate-400 for secondary text and labels */
+  --color-amber: #10b981;               /* Emerald-500 for bullish/positive gains */
+  --color-coral: #ef4444;               /* Red-500 for bearish/losses */
+  --color-primary: #3b82f6;             /* Blue-500 for system highlights/active states */
+  --color-white: #f8fafc;               /* Slate-50 for high-contrast white text */
+  --color-text-muted: #64748b;          /* Slate-500 for low-contrast text */
+  
+  /* Transparency Helpers to avoid hardcoded RGBA values in JSX */
+  --bg-dark-60: rgba(9, 13, 22, 0.6);
+  --bg-dark-80: rgba(9, 13, 22, 0.8);
+  
+  --bg-card-40: rgba(17, 24, 39, 0.4);
+  --bg-card-60: rgba(17, 24, 39, 0.6);
+  --bg-card-80: rgba(17, 24, 39, 0.8);
+  
+  --color-bullish-10: rgba(16, 185, 129, 0.1);
+  --color-bullish-20: rgba(16, 185, 129, 0.2);
+  --color-bullish-30: rgba(16, 185, 129, 0.3);
+  
+  --color-bearish-10: rgba(239, 68, 68, 0.1);
+  --color-bearish-20: rgba(239, 68, 68, 0.2);
+  --color-bearish-30: rgba(239, 68, 68, 0.3);
+  
+  --color-primary-10: rgba(59, 130, 246, 0.1);
+  --color-primary-20: rgba(59, 130, 246, 0.2);
+  
+  --color-muted-10: rgba(148, 163, 184, 0.1);
+  --color-muted-20: rgba(148, 163, 184, 0.2);
+  --color-muted-30: rgba(148, 163, 184, 0.3);
+
+  --glass-bg: rgba(17, 24, 39, 0.5);
+  --glass-border: rgba(148, 163, 184, 0.12);
+  --glass-glow: rgba(59, 130, 246, 0.08); /* Soft primary glow */
+  
+  --sidebar-width: 260px;
+  --navbar-height: 70px;
+}
+
+[data-theme='light'] {
+  /* Slate/Light Professional Finance Theme */
+  --bg-dark: #f8fafc;                  /* Light slate/blue background */
+  --bg-plum: #ffffff;                  /* White for cards and sidebars */
+  --bg-wine: #f1f5f9;                  /* Slate-100 for button overlays/accent areas */
+  
+  --color-lavender: #475569;            /* Slate-600 for secondary text and labels */
+  --color-amber: #10b981;               /* Emerald-500 for bullish/positive gains */
+  --color-coral: #ef4444;               /* Red-500 for bearish/losses */
+  --color-primary: #2563eb;             /* Blue-600 for active accents */
+  --color-white: #0f172a;               /* Slate-900 for dark text in light mode */
+  --color-text-muted: #64748b;          /* Slate-500 */
+  
+  /* Transparency Helpers configured for light background contrast */
+  --bg-dark-60: rgba(248, 250, 252, 0.6);
+  --bg-dark-80: rgba(248, 250, 252, 0.8);
+  
+  --bg-card-40: rgba(255, 255, 255, 0.4);
+  --bg-card-60: rgba(255, 255, 255, 0.6);
+  --bg-card-80: rgba(255, 255, 255, 0.8);
+  
+  --color-bullish-10: rgba(16, 185, 129, 0.08);
+  --color-bullish-20: rgba(16, 185, 129, 0.15);
+  --color-bullish-30: rgba(16, 185, 129, 0.22);
+  
+  --color-bearish-10: rgba(239, 68, 68, 0.08);
+  --color-bearish-20: rgba(239, 68, 68, 0.15);
+  --color-bearish-30: rgba(239, 68, 68, 0.22);
+  
+  --color-primary-10: rgba(37, 99, 235, 0.08);
+  --color-primary-20: rgba(37, 99, 235, 0.15);
+  
+  --color-muted-10: rgba(71, 85, 105, 0.08);
+  --color-muted-20: rgba(71, 85, 105, 0.15);
+  --color-muted-30: rgba(71, 85, 105, 0.22);
+
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(71, 85, 105, 0.12);
+  --glass-glow: rgba(37, 99, 235, 0.05);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: radial-gradient(circle at 50% 50%, var(--bg-plum) 0%, var(--bg-dark) 100%);
+  color: var(--color-white);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-muted-20);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-20);
+}
+
+/* Layout Framework */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1;
+  margin-left: var(--sidebar-width);
+  margin-top: var(--navbar-height);
+  padding: 30px;
+  min-height: calc(100vh - var(--navbar-height));
+  width: calc(100% - var(--sidebar-width));
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Glassmorphism Card System */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.glass-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(148, 163, 184, 0.2);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4), 0 0 15px 0 var(--glass-glow);
+}
+
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+.glass-card.gold-glow {
+  border-color: var(--color-bullish-20);
+}
+.glass-card.gold-glow:hover {
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4), 0 0 20px 0 var(--color-bullish-10);
+  border-color: var(--color-amber);
+}
+
+/* Inputs & Form Controls */
+.input-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-lavender);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.input-field {
+  background: var(--bg-dark-60);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--color-white);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  transition: all 0.3s;
+  width: 100%;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.25);
+  background: var(--bg-dark-80);
+}
+
+/* Buttons */
+.btn {
+  background: var(--bg-wine);
+  border: 1px solid var(--glass-border);
+  color: var(--color-white);
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px var(--color-muted-20);
+  border-color: var(--color-white);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #1d4ed8 100%);
+  border: none;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-danger {
+  background: var(--color-bearish-10);
+  border: 1px solid var(--color-coral);
+  color: var(--color-coral);
+}
+
+.btn-danger:hover {
+  background: var(--color-coral);
+  color: #ffffff;
+  box-shadow: 0 0 15px var(--color-bearish-30);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Typography Helpers */
+.text-gradient-amber {
+  background: linear-gradient(135deg, #FFF 0%, var(--color-amber) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-coral {
+  background: linear-gradient(135deg, #FFF 0%, var(--color-coral) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-lavender {
+  background: linear-gradient(135deg, #FFF 0%, var(--color-lavender) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.neon-text {
+  text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+.sentiment-bullish {
+  color: var(--color-amber);
+  font-weight: 600;
+}
+
+.sentiment-bearish {
+  color: var(--color-coral);
+  font-weight: 600;
+}
+
+.sentiment-neutral {
+  color: var(--color-lavender);
+  font-weight: 600;
+}
+
+/* Spinners and loaders */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.glow-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-muted-10);
+  border-top: 3px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Status Badges */
+.badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-block;
+}
+
+.badge-bullish {
+  background: var(--color-bullish-10);
+  color: var(--color-amber);
+  border: 1px solid var(--color-bullish-30);
+}
+
+.badge-bearish {
+  background: var(--color-bearish-10);
+  color: var(--color-coral);
+  border: 1px solid var(--color-bearish-30);
+}
+
+.badge-neutral {
+  background: var(--color-muted-10);
+  color: var(--color-lavender);
+  border: 1px solid var(--color-muted-30);
+}
+
+/* Animations */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive sidebar behaviors */
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 0px;
+  }
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 20px;
+  }
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.active {
+    transform: translateX(0);
+    width: 260px;
+    z-index: 1000;
+  }
+}
+
+/* AI status dot pulse animation */
+@keyframes pulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+}
+
+/* Logo Text Gradient styling */
+.logo-text {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, var(--color-white), var(--color-primary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  display: inline-block;
+}
+
+

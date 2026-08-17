@@ -1,0 +1,31 @@
+# Django backend .gitignore
+
+# Python cache / compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Django local files and database
+db.sqlite3
+db.sqlite3-journal
+local_settings.py
+
+# Environment variables & secrets (CRITICAL!)
+.env
+.env.local
+.env.*.local
+*.env
+secrets.json
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Editor and system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
