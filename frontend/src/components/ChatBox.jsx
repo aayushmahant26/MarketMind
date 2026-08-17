@@ -1,18 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import api from '../api/axios';
 import { Send, Bot, User, Trash2, Globe, Sparkles, Terminal } from 'lucide-react';
 import { cleanSymbol } from '../utils/formatters';
+import { AuthContext } from '../context/AuthContext';
 
 const ChatBox = () => {
+  const { user } = useContext(AuthContext);
+  const username = user?.username || 'anonymous';
+  const historyKey = `marketmind_chat_history_${username}`;
+
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
 
-  // Load chat history from localStorage on mount
+  // Load chat history from localStorage on user change / mount
   useEffect(() => {
-    const saved = localStorage.getItem('marketmind_chat_history');
+    const saved = localStorage.getItem(historyKey);
     if (saved) {
       try {
         setMessages(JSON.parse(saved));
@@ -24,16 +29,16 @@ const ChatBox = () => {
       setMessages([
         {
           role: 'assistant',
-          content: "Welcome to MarketMind AI. I am your financial research assistant. Ask me anything about Indian markets, stocks, or technical indicators.",
+          content: `Welcome to MarketMind AI, ${username}. I am your financial research assistant. Ask me anything about Indian markets, stocks, or technical indicators.`,
           timestamp: new Date().toISOString()
         }
       ]);
     }
-  }, []);
+  }, [username]);
 
   // Save chat history to localStorage
   const saveHistory = (newMessages) => {
-    localStorage.setItem('marketmind_chat_history', JSON.stringify(newMessages));
+    localStorage.setItem(historyKey, JSON.stringify(newMessages));
   };
 
   // Auto-scroll to bottom of messages
@@ -107,7 +112,7 @@ const ChatBox = () => {
       }
     ];
     setMessages(defaultMsg);
-    localStorage.removeItem('marketmind_chat_history');
+    localStorage.removeItem(historyKey);
   };
 
   return (
