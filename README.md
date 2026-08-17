@@ -112,3 +112,4 @@ To prevent exposing API keys, databases, or local workspace configurations to Gi
 * Python compilation folders (`__pycache__/`, `*.pyc`)
 * Frontend dependency caches and build directories (`node_modules/`, `dist/`)
 * IDE settings folders (`.vscode/`, `.idea/`)
+
