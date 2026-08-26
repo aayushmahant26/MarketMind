@@ -20,6 +20,5 @@ class GraphState(TypedDict):
     force_full: bool # Toggle: True (always run all), False (skip nodes)
 
     analysis_type: str
-    conversation_context: Optional[str] # Appends the past 5 chat messages for context
 
     final_report: Optional[str] # What the report_agent generates

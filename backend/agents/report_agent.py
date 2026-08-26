@@ -29,17 +29,15 @@ Politely, respectfully, and briefly inform the user that you are specialized in 
     news_data = state.get("news_data")
     risk_data = state.get("risk_data")
 
-    context = state.get("conversation_context", "")
-    context_str = f"\nConversation Context:\n{context}\n" if context else ""
-
     # Creates the common part of every prompt.
     base_header = f"""You are an expert Indian stock market analyst. 
-
-{context_str}
 
 User Query: {query}
 Symbol: {symbol}
 Market Data: {market_data}
+
+Instructions:
+You MUST explicitly mention the stock symbol or name (e.g. {symbol}) in your response so the user knows which company the analysis refers to.
 """
 
     if analysis_type == "rsi":
@@ -169,8 +167,6 @@ Do NOT output markdown tables or tabular formatting. Keep it in a brief, convers
         if not state.get("force_full", False):
             prompt = f"""You are an expert Indian stock market analyst.
 
-{context_str}
-
 User Query: {query}
 Symbol: {symbol}
 Market Data: {market_data}
@@ -186,8 +182,6 @@ Keep the answer brief, engaging, and on-point (around 80-120 words). Do NOT outp
 """
         else:
             prompt = f"""You are an expert Indian stock market analyst.
-
-{context_str}
 
 User Query:
 {query}

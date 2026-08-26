@@ -46,14 +46,13 @@ workflow.add_edge("report", END)
 
 graph = workflow.compile() # Compiles the workflow into a runnable graph.
 
-def run_marketmind(query, force_full=True, conversation_context=""):
+def run_marketmind(query, force_full=True):
     initial_state = {
         "query": query,
         "query_symbol": "",
         "symbol": "",
         "analysis_type": "",
         "force_full": force_full,
-        "conversation_context": conversation_context,
 
         "market_data": None,
         "technical_data": None,
