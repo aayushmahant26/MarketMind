@@ -12,7 +12,18 @@ router = LLMRouter() # Initializing LLMRouter.
 def build_prompt(state):
     analysis_type = state.get("analysis_type", "full")
     query = state["query"]
-    symbol = state["query_symbol"]
+    symbol = state.get("query_symbol")
+    # Check if this is an out-of-context query (no stock symbol)
+    if symbol == "None" or not symbol:
+        return f"""You are a financial research assistant named MarketMind.
+        
+User Query: {query}
+
+Instructions:
+The user's query appears to be outside the scope of stock markets, investing, technical indicators, or financial analysis.
+Politely, respectfully, and briefly inform the user that you are specialized in the Indian stock market and financial analysis, and you cannot assist with queries outside this domain. Keep the response helpful, professional, and within 40-60 words.
+"""
+
     market_data = state.get("market_data")
     technical_data = state.get("technical_data")
     news_data = state.get("news_data")
@@ -106,7 +117,8 @@ Keep it concise.
         prompt = base_header + f"""Technical Analysis: {technical_data}
 
 Instructions:
-Provide a medium-length technical analysis report.
+Provide a medium-length technical analysis report using clean bullet points (e.g. * Indicator: Explanation).
+Do NOT output markdown tables, raw HTML, table borders, or tabulations.
 Include:
 - RSI (value and interpretation)
 - MACD (MACD, Signal, and crossover interpretation)
@@ -115,13 +127,14 @@ Include:
 - Support & Resistance levels
 
 DO NOT include news analysis, news headlines, or risk scoring/risk profiles.
-Keep it moderately detailed but focused strictly on technical indicators.
+Keep it moderately detailed but focused strictly on technical indicators and formatted cleanly.
 """
     elif analysis_type == "news":
         prompt = base_header + f"""News Analysis: {news_data}
 
 Instructions:
-Provide ONLY a concise news summary based on the headlines. Mention the key news themes and whether the general news tone is positive, negative, or neutral.
+Provide a concise news summary using clean, readable bullet points (e.g. * Theme: Description).
+Do NOT output markdown tables, raw HTML, or table border lines.
 DO NOT include technical indicators, support/resistance, or risk assessment.
 Keep it concise.
 """
@@ -144,17 +157,35 @@ Provide a clear, speculative trading recommendation:
 - Key reasons supporting this recommendation
 - Associated risks
 
-Provide this in a concise, structured format.
+Provide this in a concise, structured format using clean bullet points. Do NOT output markdown tables.
 """
     elif analysis_type == "market":
         prompt = base_header + f"""
 Instructions:
 Provide ONLY a raw market quote summary based on the market data. Include current price, day high, day low, volume, and percentage change.
-DO NOT mention technical indicators (RSI, MACD, EMA, SMA, ATR, Bollinger), news, or risk profiles.
-Keep it concise.
+Do NOT output markdown tables or tabular formatting. Keep it in a brief, conversational paragraph.
 """
     else:  # full
-        prompt = f"""You are an expert Indian stock market analyst.
+        if not state.get("force_full", False):
+            prompt = f"""You are an expert Indian stock market analyst.
+
+{context_str}
+
+User Query: {query}
+Symbol: {symbol}
+Market Data: {market_data}
+Technical Analysis: {technical_data}
+News Analysis: {news_data}
+Risk Analysis: {risk_data}
+
+Instructions:
+Provide a concise, conversational, and direct analysis of the stock's trend, key levels (immediate support and resistance), and outlook based on the data above.
+Use clean, readable bullet points (e.g. * Indicator: Explanation) to list key metrics.
+Do NOT output markdown tables, raw HTML, table borders, or tabulations.
+Keep the answer brief, engaging, and on-point (around 80-120 words). Do NOT output a structured template, headers, or a long report.
+"""
+        else:
+            prompt = f"""You are an expert Indian stock market analyst.
 
 {context_str}
 
@@ -179,7 +210,11 @@ Risk Analysis:
 Instructions:
 Analyze the market data, technical indicators, news sentiment, and risk profile above. Based on this information, provide a definitive projection of the most likely future trend (Bullish, Bearish, or Sideways) and key trading levels. Do NOT output boilerplate disclaimers about being an AI that cannot predict future market movements. Speculate professionally based on the mathematical evidence.
 
-Generate a professional stock research report in this format:
+For the report sections:
+1. Under 'Risk:', provide an elaborated explanation of at least 4-5 lines depicting the meaning of the risk level, the mathematical sources of volatility (e.g. ATR, RSI oversold/overbought conditions), and specific implications for position sizing and protective stops.
+2. Under 'Recommendation:', provide detailed, step-by-step actionable advice explaining entry zones, target exit price ranges, exact stop-loss thresholds, and a comprehensive rationale. You MUST separate each numbered recommendation point with a blank line (double newline) so they render with a visible line gap in the UI.
+
+You MUST format your output exactly as shown below, using these exact labels. Do NOT include any introductory or concluding text, conversational filler, markdown titles (such as ## or ###), or extra commentary. The output must start directly with 'Trend:' and follow this format:
 
 Trend:
 Confidence:

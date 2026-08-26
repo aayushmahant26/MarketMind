@@ -236,7 +236,7 @@ const ReportCard = ({ reportText, query, symbol, date }) => {
               <Cpu size={14} color="var(--color-primary)" />
               <span style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Technical Summary</span>
             </div>
-            <p style={{ color: 'var(--color-lavender)', paddingLeft: '22px' }}>
+            <p style={{ color: 'var(--color-lavender)', paddingLeft: '22px', whiteSpace: 'pre-wrap' }}>
               {highlightKeywords(parsed.technicalSummary)}
             </p>
           </div>
@@ -248,7 +248,7 @@ const ReportCard = ({ reportText, query, symbol, date }) => {
               <Newspaper size={14} color="var(--color-primary)" />
               <span style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Market Sentiment</span>
             </div>
-            <p style={{ color: 'var(--color-lavender)', paddingLeft: '22px' }}>
+            <p style={{ color: 'var(--color-lavender)', paddingLeft: '22px', whiteSpace: 'pre-wrap' }}>
               {highlightKeywords(parsed.newsSummary)}
             </p>
           </div>
@@ -260,7 +260,7 @@ const ReportCard = ({ reportText, query, symbol, date }) => {
               <ShieldAlert size={14} color="var(--color-coral)" />
               <span style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Risk Profile</span>
             </div>
-            <p style={{ color: 'var(--color-lavender)', paddingLeft: '22px' }}>
+            <p style={{ color: 'var(--color-lavender)', paddingLeft: '22px', whiteSpace: 'pre-wrap' }}>
               {highlightKeywords(parsed.risk)}
             </p>
           </div>
@@ -278,7 +278,7 @@ const ReportCard = ({ reportText, query, symbol, date }) => {
               <Award size={16} />
               <span style={{ fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>AI Recommendation</span>
             </div>
-            <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-white)' }}>
+            <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-white)', whiteSpace: 'pre-wrap' }}>
               {highlightKeywords(parsed.recommendation)}
             </p>
           </div>

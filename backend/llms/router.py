@@ -1,30 +1,30 @@
 # This file acts as an LLM Router, deciding which AI model to use for generating responses. It first tries Gemini, and if it fails, automatically falls back to Ollama, ensuring the application continues to work even if one model is unavailable.
 
-from llms.gemini_client import GeminiClient
+from llms.groq_client import GroqClient
 from llms.ollama_client import OllamaClient
 from services.logger_service import logger
 
 
 class LLMRouter:
     def __init__(self):
-        self.gemini = GeminiClient()
+        self.groq = GroqClient()
         self.ollama = OllamaClient()
 
     def generate(self, prompt):
         try:
-            logger.info("Trying Gemini")
+            logger.info("Trying Groq")
 
-            response = self.gemini.generate(prompt)
+            response = self.groq.generate(prompt)
 
-            logger.info("Gemini response generated")
+            logger.info("Groq response generated")
 
             return {
-                "model": "gemini",
+                "model": "groq",
                 "response": response
             }
 
-        except Exception as gemini_error:
-            logger.warning(f"Gemini failed: {gemini_error}")
+        except Exception as groq_error:
+            logger.warning(f"Groq failed: {groq_error}")
 
             try:
                 logger.info("Switching to Ollama")
@@ -43,6 +43,6 @@ class LLMRouter:
 
                 raise Exception(
                     f"Both LLMs failed | "
-                    f"Gemini: {gemini_error} | "
+                    f"Groq: {groq_error} | "
                     f"Ollama: {ollama_error}"
                 )

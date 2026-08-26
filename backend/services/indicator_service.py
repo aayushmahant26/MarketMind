@@ -1,6 +1,9 @@
 import pandas as pd
+# pyright: ignore [reportMissingImports]
 from ta.momentum import RSIIndicator
+# pyright: ignore [reportMissingImports]
 from ta.trend import MACD, EMAIndicator, SMAIndicator
+# pyright: ignore [reportMissingImports]
 from ta.volatility import BollingerBands, AverageTrueRange
 
 class IndicatorService:
@@ -75,6 +78,9 @@ class IndicatorService:
         }
     
     def full_analysis(self, candles):
+        if not candles or len(candles) < 5:
+            raise ValueError("Insufficient historical data to perform technical analysis.")
+
         df = self.prepare_dataframe(candles)
 
         macd_data = self.calculate_macd(df)

@@ -14,6 +14,11 @@ def news_agent(state: GraphState):
 
     query_symbol = state["query_symbol"]
 
+    if query_symbol == "None":
+        logger.info("Skipping news agent for out of-context query")
+        state["news_data"] = None
+        return state
+
     headlines = news_service.fetch_market_news(query_symbol)
     
     news_data = {

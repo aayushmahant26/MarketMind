@@ -15,9 +15,16 @@ class NewsService:
 
         feed = feedparser.parse(url)
 
+        # Sort feed entries by published date/time (most recent first)
+        entries = sorted(
+            feed.entries,
+            key=lambda x: x.get("published_parsed") or (0, 0, 0, 0, 0, 0, 0, 0, 0),
+            reverse=True
+        )
+
         headlines = []
 
-        for entry in feed.entries[:15]:
+        for entry in entries[:15]:
             headlines.append({
                 "title": entry.title,
                 "link": entry.link,

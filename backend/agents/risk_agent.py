@@ -8,6 +8,11 @@ from services.logger_service import logger
 def risk_agent(state: GraphState):
     logger.info("Risk agent started")
 
+    if state["symbol"] == "None":
+        logger.info("Skipping risk agent for out of-context query")
+        state["risk_data"] = None
+        return state
+
     technical_data = state["technical_data"]
 
     risk_score = 0

@@ -111,14 +111,39 @@ def normalize_symbol(user_input):
     if cleaned in SYMBOL_MAP:
         return SYMBOL_MAP[cleaned]
 
-    # 2. If it's a raw index ticker (like ^NSEI), return as-is
+    # 2. Check if the database contains the symbol or name
+    try:
+        from stocks.models import Stock
+        # Try finding a stock matching the exact cleaned symbol
+        stock = Stock.objects.filter(symbol__iexact=cleaned).first()
+        if stock:
+            return stock.symbol
+
+        # Try finding a stock matching cleaned with ".NS"
+        stock = Stock.objects.filter(symbol__iexact=f"{cleaned}.NS").first()
+        if stock:
+            return stock.symbol
+
+        # Try finding a stock matching the name (prefer exact, then prefix, then contains)
+        stock = (
+            Stock.objects.filter(name__iexact=cleaned).first()
+            or Stock.objects.filter(name__istartswith=cleaned).first()
+            or Stock.objects.filter(name__icontains=cleaned).first()
+        )
+        if stock:
+            return stock.symbol
+    except Exception:
+        # Django might not be fully loaded or configured, fallback gracefully
+        pass
+
+    # 3. If it's a raw index ticker (like ^NSEI), return as-is
     if cleaned.startswith("^"):
         return cleaned
 
-    # 3. If it already has the NSE extension, return as-is
+    # 4. If it already has the NSE extension, return as-is
     if cleaned.endswith(".NS"):
         return cleaned
 
-    # 4. Otherwise, remove spaces and add .NS (e.g., "RELIANCE" → "RELIANCE.NS")
+    # 5. Otherwise, remove spaces and add .NS (e.g., "RELIANCE" → "RELIANCE.NS")
     fallback = cleaned.replace(" ", "")
     return fallback + ".NS"

@@ -14,6 +14,11 @@ def technical_agent(state: GraphState):
 
     symbol = state["symbol"]
 
+    if symbol == "None":
+        logger.info("Skipping technical agent for out of-context query")
+        state["technical_data"] = None
+        return state
+
     candles = market_service.get_historical_data(symbol)
     technical_data = indicator_service.full_analysis(candles)
 
