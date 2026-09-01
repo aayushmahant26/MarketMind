@@ -275,28 +275,45 @@ const AnalysisPage = () => {
         )}
 
         {/* Error Alert */}
-        {analysisError && (
-          <div style={{
-            background: 'var(--color-bearish-10)',
-            border: '1px solid var(--color-coral)',
-            color: 'var(--color-coral)',
-            borderRadius: '8px',
-            padding: '24px',
-            textAlign: 'center',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '10px'
-          }}>
-            <AlertTriangle size={32} />
-            <h4 style={{ fontWeight: 600 }}>Analysis Failed</h4>
-            <p style={{ fontSize: '13px' }}>{analysisError}</p>
-            <button onClick={() => triggerAnalysis(`Analyze ${selectedSymbol || searchVal.trim().toUpperCase()}`)} className="btn btn-danger" style={{ padding: '8px 16px', fontSize: '12px', marginTop: '5px' }}>
-              <ListRestart size={12} />
-              <span>Try Again</span>
-            </button>
-          </div>
-        )}
+        {analysisError && (() => {
+          const isSymbolNotFound = 
+            analysisError.toLowerCase().includes('could not retrieve market data') ||
+            analysisError.toLowerCase().includes('verify the symbol') ||
+            analysisError.toLowerCase().includes('no longer exist') ||
+            analysisError.toLowerCase().includes('not found') ||
+            analysisError.toLowerCase().includes('delisted');
+
+          return (
+            <div style={{
+              background: 'var(--color-bearish-10)',
+              border: '1px solid var(--color-coral)',
+              color: 'var(--color-coral)',
+              borderRadius: '8px',
+              padding: '24px',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '10px'
+            }}>
+              <AlertTriangle size={32} />
+              <h4 style={{ fontWeight: 600 }}>
+                {isSymbolNotFound ? "Symbol Unavailable" : "Analysis Failed"}
+              </h4>
+              <p style={{ fontSize: '13px', lineHeight: '1.5', maxWidth: '450px' }}>
+                {isSymbolNotFound 
+                  ? "Symbol no longer exists or has been delisted/renamed. Please verify the stock ticker."
+                  : analysisError}
+              </p>
+              {!isSymbolNotFound && (
+                <button onClick={() => triggerAnalysis(`Analyze ${selectedSymbol || searchVal.trim().toUpperCase()}`)} className="btn btn-danger" style={{ padding: '8px 16px', fontSize: '12px', marginTop: '5px' }}>
+                  <ListRestart size={12} />
+                  <span>Try Again</span>
+                </button>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Active report displays */}
         {activeReport && (

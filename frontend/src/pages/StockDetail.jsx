@@ -50,9 +50,15 @@ const StockDetail = () => {
       // We have used .catch for every individual API call seperately . This is because if a single promise inside Promise.all fails, the entire statement crashes 
       // By appending a .catch() to each sub-promise, we intercept individual failures. If the Technical Indicators calculation fails (perhaps the backend's indicator module is down), we fallback to mock details for that indicator only, while the historical chart and live quote summary still load successfully.
       const [infoRes, historyRes, techRes] = await Promise.all([
-        api.post('/api/stocks/info/', { symbol: querySymbol }).catch(err => {
-          console.warn("Failed fetching info, falling back", err);
-          return { data: mockInfo };
+        api.post('/api/stocks/info/', { symbol: querySymbol }).then(res => {
+          if (res.data && res.data.current_price === null && !res.data.symbol) {
+            setError("Symbol no longer exists or has been delisted/renamed.");
+          }
+          return res;
+        }).catch(err => {
+          console.warn("Failed fetching info", err);
+          setError("Symbol no longer exists or has been delisted/renamed.");
+          return { data: null };
         }),
         api.post('/api/stocks/history/', { symbol: querySymbol }).catch(err => {
           console.warn("Failed fetching history, falling back", err);
@@ -64,12 +70,16 @@ const StockDetail = () => {
         })
       ]);
 
-      setStockInfo(infoRes.data);
-      setHistory(historyRes.data);
-      setTechnical(techRes.data);
+      if (infoRes?.data?.current_price === null && infoRes?.data?.change === null) {
+        setError("Symbol no longer exists or has been delisted/renamed.");
+      }
+
+      setStockInfo(infoRes?.data);
+      setHistory(historyRes?.data || []);
+      setTechnical(techRes?.data);
     } catch (err) {
       console.error("Failed to load details for stock:", err);
-      setError("Failed to load indicators. Try checking local Django endpoints.");
+      setError("Symbol no longer exists or has been delisted/renamed.");
     } finally {
       setLoading(false);
     }
@@ -104,6 +114,31 @@ const StockDetail = () => {
         <p style={{ marginTop: '15px', color: 'var(--color-lavender)', fontFamily: 'Outfit, sans-serif', fontSize: '14px' }}>
           Loading details for {cleanSymbol(querySymbol)}...
         </p>
+      </div>
+    );
+  }
+
+  if (error || !stockInfo || (stockInfo.current_price === null && stockInfo.change === null)) {
+    return (
+      <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+        <SearchBox />
+        <div className="glass-card" style={{
+          padding: '40px',
+          textAlign: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '12px',
+          border: '1px solid var(--color-coral)',
+          color: 'var(--color-coral)',
+          margin: '20px 0'
+        }}>
+          <AlertTriangle size={36} />
+          <h3 style={{ fontSize: '18px', fontWeight: 600 }}>Symbol Unavailable</h3>
+          <p style={{ fontSize: '14px', maxWidth: '500px', color: 'var(--color-white)', fontFamily: 'Outfit, sans-serif', margin: '4px 0 0 0' }}>
+            Symbol no longer exists or has been delisted/renamed. Please verify the stock ticker.
+          </p>
+        </div>
       </div>
     );
   }
