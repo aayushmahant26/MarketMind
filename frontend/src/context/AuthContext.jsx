@@ -16,12 +16,10 @@ export const AuthProvider = ({ children }) => {
         try {
           // Call the protected endpoint to verify the token is valid
           const response = await api.get('/api/protected/');
-          // Response is: { message: "Hello <username>, token works!" }
-          const message = response.data.message;
-          const usernameMatch = message.match(/Hello (.*?),/);
-          const username = usernameMatch ? usernameMatch[1] : 'User';
+          // Extract user from API response
+          const loggedUser = response.data.username || (response.data.message?.match(/Hello (.*?),/) || [])[1] || 'User';
           
-          setUser({ username });
+          setUser({ username: loggedUser, email: response.data.email });
           setIsAuthenticated(true);
         } catch (err) {
           console.error("Token verification failed:", err);
@@ -50,14 +48,13 @@ export const AuthProvider = ({ children }) => {
       
       // Fetch user detail using the protected endpoint
       const profileResponse = await api.get('/api/protected/');
-      const message = profileResponse.data.message;
-      const usernameMatch = message.match(/Hello (.*?),/);
-      const loggedInUsername = usernameMatch ? usernameMatch[1] : username;
+      const loggedInUsername = profileResponse.data.username || (profileResponse.data.message?.match(/Hello (.*?),/) || [])[1] || username;
 
-      setUser({ username: loggedInUsername });
+      setUser({ username: loggedInUsername, email: profileResponse.data.email });
       setIsAuthenticated(true);
       setLoading(false);
       return true;
+
     } catch (err) {
       console.error("Login failed:", err);
       const errMsg = err.response?.data?.detail || 'Invalid username or password';

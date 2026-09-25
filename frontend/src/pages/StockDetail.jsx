@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { cleanSymbol } from '../utils/formatters';
 import ChartComponent from '../components/ChartComponent';
-import { Calendar } from 'lucide-react';
+import { Calendar, AlertTriangle } from 'lucide-react';
 import { ThemeContext } from '../context/ThemeContext';
 
 // Reusable Components

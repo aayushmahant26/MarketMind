@@ -25,5 +25,7 @@ def register_user(request):
 @permission_classes([IsAuthenticated])
 def protected_view(request):
     return Response({
+        "username": request.user.username,
+        "email": request.user.email,
         "message": f"Hello {request.user.username}, token works!"
-    })
+    })

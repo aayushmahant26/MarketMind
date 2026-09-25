@@ -40,9 +40,18 @@ workflow.add_conditional_edges(
     route_after_technical
 )
 
-workflow.add_edge("news", "risk")
+def route_after_news(state):
+    if state.get("skip_risk", False):
+        return "report"
+    return "risk"
+
+workflow.add_conditional_edges(
+    "news",
+    route_after_news
+)
 workflow.add_edge("risk", "report")
 workflow.add_edge("report", END)
+
 
 graph = workflow.compile() # Compiles the workflow into a runnable graph.
 

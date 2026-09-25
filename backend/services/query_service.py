@@ -12,9 +12,13 @@ def extract_symbol(query):
     global router
     upper_query = query.upper()
 
-    # 1. First, check if it's in our static dictionary map
-    for symbol in SYMBOL_MAP.keys():
-        if symbol in upper_query:
+    # 1. First, check if it's in our static dictionary map (sorted by length descending with word boundaries)
+    sorted_symbols = sorted(SYMBOL_MAP.keys(), key=len, reverse=True)
+    for symbol in sorted_symbols:
+        if symbol.startswith("^"):
+            if symbol in upper_query:
+                return symbol
+        elif re.search(r'(?:\b|^)' + re.escape(symbol) + r'(?:\b|$)', upper_query):
             return symbol
 
     # 2. Try falling back to LLM to correct spelling and extract the correct entity name/symbol

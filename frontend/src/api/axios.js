@@ -1,11 +1,14 @@
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
 
 // Request interceptor to add authorization token
 // This is a function that will be called before every request is sent.
@@ -76,7 +79,7 @@ api.interceptors.response.use(
       if (refreshToken) {
         try {
           // Use axios directly instead of the 'api' instance to avoid interceptor loop
-          const response = await axios.post('http://localhost:8000/api/refresh/', {
+          const response = await axios.post(`${API_BASE_URL}/api/refresh/`, {
             refresh: refreshToken,
           });
           const newAccessToken = response.data.access;

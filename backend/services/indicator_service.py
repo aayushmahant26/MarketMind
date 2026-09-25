@@ -13,14 +13,24 @@ class IndicatorService:
         return df
     
     def calculate_rsi(self, df):
-        rsi = RSIIndicator(close=df["close"], window=14)
-        return round(float(rsi.rsi().iloc[-1]), 2)
+        window = min(14, max(2, len(df) - 1))
+        if len(df) >= 3:
+            rsi = RSIIndicator(close=df["close"], window=window)
+            series = rsi.rsi().dropna()
+            if not series.empty:
+                return round(float(series.iloc[-1]), 2)
+        return 50.0
     
     def calculate_macd(self, df):
-        macd = MACD(close=df["close"])
-
-        macd_value = round(float(macd.macd().iloc[-1]), 2)
-        signal_value = round(float(macd.macd_signal().iloc[-1]), 2)
+        if len(df) >= 26:
+            macd = MACD(close=df["close"])
+            m_series = macd.macd().dropna()
+            s_series = macd.macd_signal().dropna()
+            macd_value = round(float(m_series.iloc[-1]), 2) if not m_series.empty else 0.0
+            signal_value = round(float(s_series.iloc[-1]), 2) if not s_series.empty else 0.0
+        else:
+            macd_value = 0.0
+            signal_value = 0.0
 
         return {
             "macd": macd_value,
@@ -28,29 +38,53 @@ class IndicatorService:
         }
     
     def calculate_ema(self, df, window=20):
-        ema = EMAIndicator(close=df["close"], window=window)
-        return round(float(ema.ema_indicator().iloc[-1]), 2)
+        w = min(window, max(2, len(df)))
+        if len(df) >= 2:
+            ema = EMAIndicator(close=df["close"], window=w)
+            series = ema.ema_indicator().dropna()
+            if not series.empty:
+                return round(float(series.iloc[-1]), 2)
+        return round(float(df["close"].iloc[-1]), 2)
     
     def calculate_sma(self, df, window=50):
-        sma = SMAIndicator(close=df["close"], window=window)
-        return round(float(sma.sma_indicator().iloc[-1]), 2)
+        w = min(window, max(2, len(df)))
+        if len(df) >= 2:
+            sma = SMAIndicator(close=df["close"], window=w)
+            series = sma.sma_indicator().dropna()
+            if not series.empty:
+                return round(float(series.iloc[-1]), 2)
+        return round(float(df["close"].iloc[-1]), 2)
     
     def calculate_bollinger(self, df):
-        bb = BollingerBands(close=df["close"])
+        w = min(20, max(2, len(df)))
+        if len(df) >= 2:
+            bb = BollingerBands(close=df["close"], window=w)
+            h_series = bb.bollinger_hband().dropna()
+            l_series = bb.bollinger_lband().dropna()
+            upper = round(float(h_series.iloc[-1]), 2) if not h_series.empty else round(float(df["close"].iloc[-1]), 2)
+            lower = round(float(l_series.iloc[-1]), 2) if not l_series.empty else round(float(df["close"].iloc[-1]), 2)
+        else:
+            c = round(float(df["close"].iloc[-1]), 2)
+            upper, lower = c, c
 
         return {
-            "upper_band": round(float(bb.bollinger_hband().iloc[-1]), 2),
-            "lower_band": round(float(bb.bollinger_lband().iloc[-1]), 2)
+            "upper_band": upper,
+            "lower_band": lower
         }
     
     def calculate_atr(self, df):
-        atr = AverageTrueRange(
-            high=df["high"],
-            low=df["low"],
-            close=df["close"]
-        )
-
-        return round(float(atr.average_true_range().iloc[-1]), 2)
+        w = min(14, max(2, len(df)))
+        if len(df) >= 2:
+            atr = AverageTrueRange(
+                high=df["high"],
+                low=df["low"],
+                close=df["close"],
+                window=w
+            )
+            series = atr.average_true_range().dropna()
+            if not series.empty:
+                return round(float(series.iloc[-1]), 2)
+        return round(float(df["high"].iloc[-1] - df["low"].iloc[-1]), 2)
     
     def detect_trend(self, df):
         current_price = df["close"].iloc[-1]
@@ -58,16 +92,16 @@ class IndicatorService:
         ema20 = self.calculate_ema(df, 20)
         sma50 = self.calculate_sma(df, 50)
 
-        if current_price > ema20 > sma50:
+        if current_price > ema20 >= sma50:
             return "Bullish"
 
-        elif current_price < ema20 < sma50:
+        elif current_price < ema20 <= sma50:
             return "Bearish"
 
         return "Sideways"
     
     def calculate_support_resistance(self, df):
-        recent = df.tail(20)
+        recent = df.tail(min(20, len(df)))
 
         support = round(float(recent["low"].min()), 2)
         resistance = round(float(recent["high"].max()), 2)
@@ -78,7 +112,7 @@ class IndicatorService:
         }
     
     def full_analysis(self, candles):
-        if not candles or len(candles) < 5:
+        if not candles or len(candles) < 2:
             raise ValueError("Insufficient historical data to perform technical analysis.")
 
         df = self.prepare_dataframe(candles)
@@ -101,4 +135,4 @@ class IndicatorService:
             "resistance": sr_data["resistance"]
         }
 
-        return analysis
+        return analysis
