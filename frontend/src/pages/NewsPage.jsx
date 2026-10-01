@@ -6,7 +6,10 @@ import {
   RefreshCw,
   Newspaper,
   Calendar,
-  AlertTriangle
+  AlertTriangle,
+  Sparkles,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { mockSentiment } from '../utils/mockData';
 
@@ -17,6 +20,61 @@ const NewsPage = () => {
   const [newsData, setNewsData] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [isFallback, setIsFallback] = useState(false);
+  const [summaries, setSummaries] = useState({});
+
+  const handleToggleSummary = async (articleKey, article) => {
+    // If summary data already exists, toggle open/close
+    if (summaries[articleKey]?.data) {
+      setSummaries(prev => ({
+        ...prev,
+        [articleKey]: {
+          ...prev[articleKey],
+          isOpen: !prev[articleKey].isOpen
+        }
+      }));
+      return;
+    }
+
+    // Set loading state
+    setSummaries(prev => ({
+      ...prev,
+      [articleKey]: {
+        loading: true,
+        data: null,
+        error: null,
+        isOpen: true
+      }
+    }));
+
+    try {
+      const response = await api.post('/api/stocks/news/summarize/', {
+        title: article.title,
+        symbol: query,
+        link: article.link
+      });
+      setSummaries(prev => ({
+        ...prev,
+        [articleKey]: {
+          loading: false,
+          data: response.data,
+          error: null,
+          isOpen: true
+        }
+      }));
+    } catch (err) {
+      console.error('Failed to summarize article:', err);
+      setSummaries(prev => ({
+        ...prev,
+        [articleKey]: {
+          loading: false,
+          data: null,
+          error: err.response?.data?.error || 'Unable to generate AI analysis for this article.',
+          isOpen: true
+        }
+      }));
+    }
+  };
+
 
   // Quick select topics
   const quickTags = [
@@ -293,10 +351,138 @@ const NewsPage = () => {
                       <span>{formatDate(article.published)}</span>
                     </div>
 
-                    <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
-                      Google News RSS
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleSummary(article.title || idx, article)}
+                        style={{
+                          background: summaries[article.title || idx]?.isOpen
+                            ? 'var(--color-primary-20)'
+                            : 'var(--color-primary-10)',
+                          border: `1px solid ${summaries[article.title || idx]?.isOpen ? 'var(--color-primary)' : 'var(--color-primary-20)'}`,
+                          color: 'var(--color-primary)',
+                          padding: '5px 12px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontFamily: 'Outfit, sans-serif',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          transition: 'all 0.2s'
+                        }}
+                        title="Generate short AI financial analysis"
+                      >
+                        <Sparkles size={13} />
+                        <span>{summaries[article.title || idx]?.isOpen ? 'Hide AI Brief' : 'AI Analysis'}</span>
+                        {summaries[article.title || idx]?.isOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                      </button>
+
+                      <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                        Google News RSS
+                      </span>
+                    </div>
                   </div>
+
+                  {/* Expandable AI Summary Section */}
+                  {summaries[article.title || idx]?.isOpen && (
+                    <div className="animate-fade-in" style={{ marginTop: '4px' }}>
+                      {summaries[article.title || idx]?.loading && (
+                        <div style={{
+                          padding: '14px 16px',
+                          borderRadius: '8px',
+                          background: 'var(--bg-dark-60)',
+                          border: '1px solid var(--glass-border)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px'
+                        }}>
+                          <div className="glow-spinner" style={{ width: '16px', height: '16px', borderWidth: '2px' }}></div>
+                          <span style={{ fontSize: '12px', color: 'var(--color-lavender)', fontFamily: 'Outfit, sans-serif' }}>
+                            AI is analyzing key market takeaways and sentiment...
+                          </span>
+                        </div>
+                      )}
+
+                      {summaries[article.title || idx]?.error && (
+                        <div style={{
+                          padding: '12px 16px',
+                          borderRadius: '8px',
+                          background: 'var(--color-bearish-10)',
+                          border: '1px solid var(--color-coral)',
+                          color: 'var(--color-coral)',
+                          fontSize: '12px'
+                        }}>
+                          {summaries[article.title || idx].error}
+                        </div>
+                      )}
+
+                      {summaries[article.title || idx]?.data && (
+                        <div style={{
+                          padding: '16px 20px',
+                          borderRadius: '8px',
+                          background: 'var(--bg-plum)',
+                          border: '1px solid var(--glass-border)',
+                          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '12px'
+                        }}>
+                          {/* Header row with badge */}
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            borderBottom: '1px solid var(--glass-border)',
+                            paddingBottom: '8px'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-primary)', fontSize: '12px', fontWeight: 600, fontFamily: 'Outfit, sans-serif' }}>
+                              <Sparkles size={14} />
+                              <span style={{ letterSpacing: '0.5px' }}>AI FINANCIAL BRIEF</span>
+                            </div>
+                            <span className={`badge ${
+                              summaries[article.title || idx].data.sentiment === 'Bullish' ? 'badge-bullish' :
+                              summaries[article.title || idx].data.sentiment === 'Bearish' ? 'badge-bearish' : 'badge-neutral'
+                            }`} style={{ fontSize: '10px', padding: '3px 8px' }}>
+                              {summaries[article.title || idx].data.sentiment}
+                            </span>
+                          </div>
+
+                          {/* 3 Structured Insights */}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', lineHeight: '1.5' }}>
+                            <div>
+                              <span style={{ fontWeight: 600, color: 'var(--color-lavender)', fontFamily: 'Outfit, sans-serif' }}>
+                                Quick Take:{" "}
+                              </span>
+                              <span style={{ color: 'var(--color-white)' }}>
+                                {summaries[article.title || idx].data.headline_essence}
+                              </span>
+                            </div>
+
+                            <div>
+                              <span style={{ fontWeight: 600, color: 'var(--color-lavender)', fontFamily: 'Outfit, sans-serif' }}>
+                                Market Impact:{" "}
+                              </span>
+                              <span style={{ color: 'var(--color-white)' }}>
+                                {summaries[article.title || idx].data.market_impact}
+                              </span>
+                            </div>
+
+                            <div>
+                              <span style={{ fontWeight: 600, color: 'var(--color-lavender)', fontFamily: 'Outfit, sans-serif' }}>
+                                Key Takeaway:{" "}
+                              </span>
+                              <span style={{ color: 'var(--color-white)' }}>
+                                {summaries[article.title || idx].data.key_takeaway}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                 </div>
               ))
             ) : (

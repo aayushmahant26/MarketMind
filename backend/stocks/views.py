@@ -94,6 +94,30 @@ def market_news(request):
         return Response({"error": str(e)}, status=400)
 
 
+@api_view(['POST'])
+def summarize_news(request):
+    try:
+        title = request.data.get("title", "").strip()
+        symbol = request.data.get("symbol", "NIFTY").strip()
+        link = request.data.get("link", "").strip()
+
+        if not title:
+            return Response(
+                {"error": "News title is required for analysis."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        summary = news_service.summarize_news(title=title, symbol=symbol, link=link)
+        return Response(summary)
+
+    except Exception as e:
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+
 @api_view(['GET'])
 def stock_search(request):
     query = request.GET.get("q", "").strip().upper()

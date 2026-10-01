@@ -32,3 +32,49 @@ class NewsService:
             })
 
         return headlines
+
+    def summarize_news(self, title, symbol="NIFTY", link=None):
+        import json
+        import re
+        from llms.router import LLMRouter
+
+        router = LLMRouter()
+
+        prompt = f"""You are an elite financial news analyst for the Indian stock market.
+Analyze the following financial news item for {symbol}:
+
+Headline: {title}
+
+Provide a concise, high-impact breakdown formatted strictly as JSON with the following keys:
+- "headline_essence": 1 clear sentence summarizing what occurred.
+- "market_impact": 1-2 sentences on how this impacts the stock price, company earnings, or broader market sentiment.
+- "sentiment": Exactly one word: "Bullish", "Bearish", or "Neutral".
+- "key_takeaway": 1 actionable bullet point for traders/investors.
+
+Return ONLY the raw JSON object, without any markdown code fences, backticks, or extra commentary.
+"""
+
+        result = router.generate(prompt)
+        raw_text = result.get("response", "").strip()
+
+        # Clean any markdown code blocks if the LLM wrapped it
+        clean_text = re.sub(r"^```(?:json)?", "", raw_text, flags=re.MULTILINE)
+        clean_text = re.sub(r"```$", "", clean_text, flags=re.MULTILINE).strip()
+
+        try:
+            parsed = json.loads(clean_text)
+            return {
+                "headline_essence": parsed.get("headline_essence", title),
+                "market_impact": parsed.get("market_impact", "No direct impact details available."),
+                "sentiment": parsed.get("sentiment", "Neutral"),
+                "key_takeaway": parsed.get("key_takeaway", "Monitor price action for subsequent reactions."),
+                "model": result.get("model", "ai")
+            }
+        except Exception:
+            return {
+                "headline_essence": title,
+                "market_impact": clean_text,
+                "sentiment": "Neutral",
+                "key_takeaway": "Review full article for detailed financial metrics.",
+                "model": result.get("model", "ai")
+            }

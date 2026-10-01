@@ -4,6 +4,7 @@ from .views import (
     stock_history,
     technical_analysis,
     market_news,
+    summarize_news,
     stock_search,
     get_all_stocks
 )
@@ -13,6 +14,7 @@ urlpatterns = [
     path('history/', stock_history),
     path('technical/', technical_analysis),
     path('news/', market_news),
+    path('news/summarize/', summarize_news),
     path('search/', stock_search),
     path('all/', get_all_stocks),
-]
+]
