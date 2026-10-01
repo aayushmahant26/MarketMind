@@ -7,15 +7,13 @@ import { Layers } from 'lucide-react';
 import SearchBox from '../components/SearchBox';
 import AiAssistantPrompt from '../components/AiAssistantPrompt';
 import NewsWidget from '../components/NewsWidget';
-import TopMoversList from '../components/TopMoversList';
 import WatchlistPreview from '../components/WatchlistPreview';
 
 // Mock Fallbacks
-import { mockIndices, mockMovers, mockSentiment } from '../utils/mockData';
+import { mockIndices, mockSentiment } from '../utils/mockData';
 
 const Dashboard = () => {
   const [indices, setIndices] = useState([]);
-  const [topMovers, setTopMovers] = useState([]);
   const [watchlist, setWatchlist] = useState([]);
   const [newsData, setNewsData] = useState(null);
 
@@ -41,32 +39,11 @@ const Dashboard = () => {
       }
     };
 
-    // 2. Fetch Top Movers
-    const fetchTopMovers = async () => {
-      try {
-        const results = await Promise.all([
-          api.post('/api/stocks/info/', { symbol: 'RELIANCE' }).catch(() => ({ data: mockMovers[0] })),
-          api.post('/api/stocks/info/', { symbol: 'TCS' }).catch(() => ({ data: mockMovers[1] })),
-          api.post('/api/stocks/info/', { symbol: 'INFY' }).catch(() => ({ data: mockMovers[2] })),
-          api.post('/api/stocks/info/', { symbol: 'HDFCBANK' }).catch(() => ({ data: mockMovers[3] }))
-        ]);
-        const mapped = results.map((r, i) => ({
-          ...r.data,
-          change: r.data.change !== undefined ? r.data.change : mockMovers[i].change,
-          changePercent: r.data.changePercent !== undefined ? r.data.changePercent : mockMovers[i].changePercent
-        }));
-        setTopMovers(mapped);
-      } catch (err) {
-        console.error("Error loading top movers:", err);
-        setTopMovers(mockMovers);
-      }
-    };
-
-    // 3. Fetch Watchlist Preview
+    // 2. Fetch Watchlist Preview
     const fetchWatchlist = async () => {
       try {
         const response = await api.get('/api/watchlist/');
-        setWatchlist(response.data.slice(0, 4)); // show top 3 items
+        setWatchlist(response.data.slice(0, 4)); // show top 4 items
       } catch (err) {
         console.error("Error loading watchlist:", err);
       } finally {
@@ -74,7 +51,7 @@ const Dashboard = () => {
       }
     };
 
-    // 4. Fetch Market News
+    // 3. Fetch Market News
     const fetchNews = async () => {
       try {
         const response = await api.get('/api/stocks/news/');
@@ -96,7 +73,6 @@ const Dashboard = () => {
     };
 
     fetchIndices();
-    fetchTopMovers();
     fetchWatchlist();
     fetchNews();
   }, []);
@@ -147,19 +123,12 @@ const Dashboard = () => {
         <NewsWidget loadingNews={loadingNews} newsData={newsData} />
       </div>
 
-      {/* Bottom Grid: Top Movers & Watchlist Preview */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '20px'
-      }} className="dashboard-bottom-grid">
-        <TopMoversList topMovers={topMovers} />
-        <WatchlistPreview loadingWatchlist={loadingWatchlist} watchlist={watchlist} />
-      </div>
+      {/* Watchlist Preview */}
+      <WatchlistPreview loadingWatchlist={loadingWatchlist} watchlist={watchlist} />
 
       <style>{`
         @media (max-width: 900px) {
-          .dashboard-mid-grid, .dashboard-bottom-grid {
+          .dashboard-mid-grid {
             grid-template-columns: 1fr !important;
           }
         }

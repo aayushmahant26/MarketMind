@@ -34,11 +34,16 @@ const WatchlistPreview = ({ loadingWatchlist, watchlist }) => {
       </div>
 
       {loadingWatchlist ? (
-        <div style={{ display: 'flex', flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', flexGrow: 1, alignItems: 'center', justifyContent: 'center', minHeight: '80px' }}>
           <div className="glow-spinner" style={{ width: '20px', height: '20px' }}></div>
         </div>
       ) : watchlist.length > 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flexGrow: 1 }}>
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', 
+          gap: '14px', 
+          flexGrow: 1 
+        }}>
           {watchlist.map((item) => (
             <div 
               key={item.id}
@@ -47,20 +52,20 @@ const WatchlistPreview = ({ loadingWatchlist, watchlist }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '12px 14px',
+                padding: '14px 18px',
                 background: 'var(--bg-card-40)',
                 border: '1px solid var(--glass-border)',
                 borderRadius: '8px',
                 cursor: 'pointer',
-                transition: 'all 0.3s'
+                transition: 'all 0.25s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'var(--color-muted-30)';
-                e.currentTarget.style.transform = 'translateX(5px)';
+                e.currentTarget.style.borderColor = 'var(--color-primary-40)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.borderColor = 'var(--glass-border)';
-                e.currentTarget.style.transform = 'translateX(0)';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
               <div>
